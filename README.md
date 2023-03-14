@@ -1,6 +1,6 @@
-You're on the right track, only what I find easier than a Keyboard Hook is to implement `IMessageFilter` on the main form. This scheme uses a watchdog timer that acts as a rate detector so that it can distinguish a human entering keystrokes (slower) from a barcode scanner entering keystrokes.
+I think you're on the right track, only what I find easier than a Keyboard Hook is to implement [IMessageFilter](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.imessagefilter) on the main form. This scheme uses a watchdog timer that acts as a rate detector so that it can distinguish a human entering keystrokes (slower) from a barcode scanner entering keystrokes.
 
-So, this is how you can detect the scan but it doesn't *intercept* the keystrokes because doing so would swallow any slower human keystrokes. This means a focused `TextBox` is going to receive all of the keystrokes (e.g. "abc, def") but when you detect a scan all you have to do is string replace with the version you want.
+Here is one way to detect the scan but note that it doesn't *intercept* the keystrokes because doing so would swallow any slower human keystrokes. This means a focused `TextBox` is going to receive all of the keystrokes (e.g. "abc, def") but when you detect a scan all you have to do is string replace with the version you want.
 
     public partial class BarcodeScannerForm : Form, IMessageFilter
     {
@@ -42,6 +42,23 @@ So, this is how you can detect the scan but it doesn't *intercept* the keystroke
                     }
                 });
         }
+        private void parseScannedText(string scannedText)
+        {
+            string[] parse = 
+                scannedText
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(_=>_.Trim())
+                .ToArray();
+            textBoxIndex0.Text = parse[0];
+            if(parse.Length > 1)
+            {
+                textBoxIndex1.Text= parse[1];
+            }
+            else
+            {
+                textBoxIndex1.Clear();
+            }
+        }
         int _keyCount = 0;
         const int SCAN_MIN_LENGTH = 8; 
         const double SECONDS_PER_CHARACTER_MIN_PERIOD = 0.1;
@@ -79,7 +96,7 @@ So, this is how you can detect the scan but it doesn't *intercept* the keystroke
     private void initImages()
     {
         displayBarCode("abc, def");
-        displayQRCode("abc, def");
+        displayQRCode("ghi, jkl");
     }
 
     private void displayQRCode(string text)
@@ -93,4 +110,4 @@ So, this is how you can detect the scan but it doesn't *intercept* the keystroke
     }
 
 
-  [1]: https://i.stack.imgur.com/rOsuS.png
+  [1]: https://i.stack.imgur.com/hQQaP.png

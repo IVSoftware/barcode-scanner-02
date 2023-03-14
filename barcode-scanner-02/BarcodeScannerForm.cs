@@ -40,11 +40,32 @@ namespace barcode_scanner_00
                         _keyCount = 0;
                         if(_buffer.Length > SCAN_MIN_LENGTH)
                         {
-                            BeginInvoke(()=>MessageBox.Show(_buffer.ToString()));
+                            var scannedText = _buffer.ToString();
+                            BeginInvoke(()=>parseScannedText(scannedText));
+                            // For testing purposes:
+                            BeginInvoke(()=>MessageBox.Show(scannedText));
                         }
                     }
                 });
         }
+        private void parseScannedText(string scannedText)
+        {
+            string[] parse = 
+                scannedText
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(_=>_.Trim())
+                .ToArray();
+            textBoxIndex0.Text = parse[0];
+            if(parse.Length > 1)
+            {
+                textBoxIndex1.Text= parse[1];
+            }
+            else
+            {
+                textBoxIndex1.Clear();
+            }
+        }
+
         int _keyCount = 0;
         const int SCAN_MIN_LENGTH = 8; 
         const double SECONDS_PER_CHARACTER_MIN_PERIOD = 0.1;
