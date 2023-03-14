@@ -1,6 +1,10 @@
-I think you're on the right track, only what I find easier than a Keyboard Hook is to implement [IMessageFilter](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.imessagefilter) on the main form. This scheme uses a watchdog timer that acts as a rate detector so that it can distinguish a human entering keystrokes (slower) from a barcode scanner entering keystrokes.
+I think you're on the right track, only I find it easier to hook the  keyboard events by implementing [IMessageFilter](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.imessagefilter) on the main form. 
 
-Here is one way to detect the scan but note that it doesn't *intercept* the keystrokes because doing so would swallow any slower human keystrokes. This means a focused `TextBox` is going to receive all of the keystrokes (e.g. "abc, def") but when you detect a scan all you have to do is string replace with the version you want.
+This scheme uses a watchdog timer that acts as a rate detector so that it can distinguish a human entering keystrokes (slower) from a barcode scanner entering keystrokes. Note that while this detects the scan, it doesn't *intercept* the keystrokes because doing so would swallow any slower human keystrokes. This means a focused `TextBox` is still going to receive all of the keystrokes (e.g. "abc, def") emitted by the scanner, but once you detect that a scan has occurred you can just parse it out and do string replacement as necessary (e.g. "def"). 
+
+**You may want to avoid using commas in your scan codes.*
+
+***
 
     public partial class BarcodeScannerForm : Form, IMessageFilter
     {
@@ -41,7 +45,7 @@ Here is one way to detect the scan but note that it doesn't *intercept* the keys
                         }
                     }
                 });
-        }
+        }        
         private void parseScannedText(string scannedText)
         {
             string[] parse = 

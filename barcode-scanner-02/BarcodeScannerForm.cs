@@ -71,6 +71,11 @@ namespace barcode_scanner_00
         const double SECONDS_PER_CHARACTER_MIN_PERIOD = 0.1;
 
         private readonly QRCodeGenerator _generator = new QRCodeGenerator();
+        private void initImages()
+        {
+            displayBarCode("abc, def");
+            displayQRCode("ghi, jkl");
+        }
         private void displayBarCode(string text)
         {
             if (text.Length > 16)
@@ -90,12 +95,6 @@ namespace barcode_scanner_00
                     );
             }
         }
-        private void initImages()
-        {
-            displayBarCode("abc, def");
-            displayQRCode("ghi, jkl");
-        }
-
         private void displayQRCode(string text)
         {
             var qrCode = new QRCode(
