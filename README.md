@@ -2,8 +2,6 @@ I think you're on the right track, only I find it easier to hook the  keyboard e
 
 This scheme uses a watchdog timer that acts as a rate detector so that it can distinguish a human entering keystrokes (slower) from a barcode scanner entering keystrokes. Note that while this detects the scan, it doesn't *intercept* the keystrokes because doing so would swallow any slower human keystrokes. This means a focused `TextBox` is still going to receive all of the keystrokes (e.g. "abc, def") emitted by the scanner, but once you detect that a scan has occurred you can just parse it out and do string replacement as necessary (e.g. "def"). 
 
-**You may want to avoid using commas in your scan codes.*
-
 ***
 
     public partial class BarcodeScannerForm : Form, IMessageFilter
@@ -78,6 +76,11 @@ This scheme uses a watchdog timer that acts as a rate detector so that it can di
 [![scans][1]][1]
 
     private readonly QRCodeGenerator _generator = new QRCodeGenerator();
+    private void initImages()
+    {
+        displayBarCode("abc, def");
+        displayQRCode("ghi, jkl");
+    }
     private void displayBarCode(string text)
     {
         if (text.Length > 16)
@@ -97,12 +100,6 @@ This scheme uses a watchdog timer that acts as a rate detector so that it can di
                 );
         }
     }
-    private void initImages()
-    {
-        displayBarCode("abc, def");
-        displayQRCode("ghi, jkl");
-    }
-
     private void displayQRCode(string text)
     {
         var qrCode = new QRCode(
